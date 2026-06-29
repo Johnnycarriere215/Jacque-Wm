@@ -49,7 +49,12 @@ windows = { version = "0.58", features = [
     "Win32_Graphics_Direct3D11",
     "Win32_Graphics_Dxgi",
 ] }
-windows-result = "0.1"
+# NOTE: bumped from 0.1 → 0.3 so the type path matches what `windows`
+# 0.58 re-exports through `windows::core::Error`. Using a mismatched
+# major version produced `?` propagation errors throughout the
+# platform layer (the From<windows::core::Error> impl in src/error.rs
+# could not cover the actual Result<_, windows_result::error::Error>).
+windows-result = "0.3"
 windows-targets = "0.52"
 
 # ---------------------------------------------------------------------

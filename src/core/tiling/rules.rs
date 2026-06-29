@@ -9,9 +9,11 @@ use crate::core::wm::WindowId;
 use crate::core::WorkspaceIndex;
 
 /// What should happen to a window before the layout pass.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum WindowDisposition {
-    /// Window joins the tiled tree at its current workspace.
+    /// Window joins the tiled tree at its current workspace. This is
+    /// the safest fallback for unknown processes.
+    #[default]
     Tile,
     /// Window is removed from the tree; the user is free to drag it.
     Float,

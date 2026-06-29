@@ -17,8 +17,6 @@
 //! becomes their own record and is not part of the recursive layout
 //! pass.
 
-use std::collections::HashMap;
-
 use crate::core::wm::{MonitorId, Rect, WindowId, WindowMetadata, WindowSnapshot};
 
 pub mod engine;
@@ -26,8 +24,8 @@ pub mod rules;
 pub mod tree;
 
 pub use engine::{TilingEngine, TilingEngineImpl};
-pub use rules::{LayoutRule, RuleDecision};
-pub use tree::{Direction, SplitBar, SplitNode, TreeNode, WindowNode};
+pub use rules::{LayoutRule, RuleDecision, WindowDisposition};
+pub use tree::{Direction, SplitBar, TreeNode, WindowNode};
 
 // =====================================================================
 // Public geometry helpers
@@ -143,7 +141,7 @@ pub struct TiledWindow {
 // Per-workspace state stored by the TilingEngine implementation
 // =====================================================================
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WorkspaceTreeState {
     pub root: Option<TreeNode>,
     pub floats: Vec<TiledWindow>,
@@ -168,7 +166,7 @@ impl WorkspaceTreeState {
         match &self.root {
             None => false,
             Some(TreeNode::Window(_)) => true,
-            Some(TreeNode::Split(s)) => !s.windows().is_empty(),
+            Some(TreeNode::Split(_)) => true, // any split has at least one leaf by construction
         }
     }
 }
@@ -235,22 +233,16 @@ pub fn split_rect(parent: Rect, direction: Direction, ratio: f32, inner_gap: i32
 }
 
 // =====================================================================
-// Default policy for window assignment
+// Engine-side helper: convert snapshots to the working set used in a
+// single recalc pass.
 // =====================================================================
 
-/// Decide whether a newly-discovered window should enter the tiling
-/// tree, the float pool, or be marked transient.
-/// Implemented in [`crate::core::apps`] but the engine consumes the
-/// decision so we re-export it.
-pub use crate::core::apps::WindowDisposition as Disposition;
-
 /// Engine-side helper: convert a list of tracked windows into the
-/// working set used during a single recalculation.
-pub fn working_set<'a>(
-    snapshots: impl IntoIterator<Item = &'a WindowSnapshot>,
-) -> Vec<&'a WindowMetadata> {
+/// working set used during a single recalculation. Returns owned
+/// `WindowMetadata` values the engine can move freely.
+pub fn working_set(snapshots: &[WindowSnapshot]) -> Vec<WindowMetadata> {
     snapshots
-        .into_iter()
+        .iter()
         .map(|s| WindowMetadata {
             id: s.id,
             process: crate::core::wm::ProcessInfo {

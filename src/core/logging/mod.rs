@@ -1,7 +1,7 @@
 //! Logging initialisation.
 //!
 //! Uses `tracing` + `tracing-appender` with a daily-rotating file in
-//! `%APPDATA%\JacqueWM\logs\jacquewm.log`. The console layer is only
+//! `%APPDATA%\\JacqueWM\\logs\\jacquewm.log`. The console layer is only
 //! attached when `JACQUEWM_LOG=stdout` is set.
 
 use std::path::{Path, PathBuf};
@@ -14,7 +14,7 @@ pub use tracing_subscriber::util::SubscriberInitExt;
 
 use crate::error::{JacqueError, Result};
 
-/// Resolves `%APPDATA%\JacqueWM\logs` and creates it if missing.
+/// Resolves `%APPDATA%\\JacqueWM\\logs` and creates it if missing.
 pub fn logs_dir() -> Result<PathBuf> {
     let base = std::env::var_os("APPDATA")
         .map(PathBuf::from)
@@ -41,7 +41,7 @@ pub struct LoggingGuard {
 /// `RUST_LOG` or `Config::default_log_filter()`.
 /// `to_stdout` — whether to also write logs to stdout.
 /// `enable_file` — whether to also write to a daily-rotating file
-/// in `%APPDATA%\JacqueWM\logs\`.
+/// in `%APPDATA%\\JacqueWM\\logs\\`.
 pub fn init(filter: &str, to_stdout: bool, enable_file: bool) -> Result<LoggingGuard> {
     let resolved = if filter.is_empty() {
         std::env::var("RUST_LOG").unwrap_or_else(|_| {
@@ -61,6 +61,8 @@ pub fn init(filter: &str, to_stdout: bool, enable_file: bool) -> Result<LoggingG
         None
     };
 
+    // NOTE: `tracing-appender` renamed `Writer` → `Write` (it's the
+    // non-blocking writer handle, NOT the `std::io::Write` trait).
     let (file_writer, file_guard) = match &dir {
         Some(path) => {
             let appender = tracing_appender::rolling::daily(path, "jacquewm.log");
@@ -95,12 +97,12 @@ pub fn init(filter: &str, to_stdout: bool, enable_file: bool) -> Result<LoggingG
 fn attach_subscriber<W>(
     filter: EnvFilter,
     console_writer: Option<W>,
-    file_writer: tracing_appender::non_blocking::Writer,
+    file_writer: tracing_appender::non_blocking::Write,
 ) where
     W: for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + Send + Sync + 'static,
 {
-    use tracing_subscriber::fmt::MakeWriter;
-
+    // The `MakeWriter` trait is already referenced in the `where`
+    // bound above; no inner `use` is required.
     let file_layer = tracing_subscriber::fmt::layer()
         .with_writer(file_writer)
         .with_ansi(false)

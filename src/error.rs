@@ -116,11 +116,43 @@ impl JacqueError {
 }
 
 // =====================================================================
-// Conversions — kept local to avoid coupling to anyhow elsewhere.
+// Display impl for ComInterfaceId
+// ---------------------------------------------------------------------
+// Required by `thiserror`'s `{interface}` format specifier in
+// `JacqueError::Com` above; without it, build fails with
+// `E0599: the method as_display exists but its trait bounds were not
+// satisfied`.
 // =====================================================================
 
-impl From<windows_result::Error> for JacqueError {
-    fn from(err: windows_result::Error) -> Self {
+impl fmt::Display for ComInterfaceId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let name = match self {
+            ComInterfaceId::VirtualDesktop => "IVirtualDesktop",
+            ComInterfaceId::VirtualDesktopManager => "IVirtualDesktopManager",
+            ComInterfaceId::VirtualDesktopManagerInternal => {
+                "IVirtualDesktopManagerInternal"
+            }
+            ComInterfaceId::ServiceProvider => "IServiceProvider",
+            ComInterfaceId::ObjectArray => "IObjectArray",
+            ComInterfaceId::ApplicationView => "IApplicationView",
+            ComInterfaceId::Unknown => "UnknownInterface",
+        };
+        f.write_str(name)
+    }
+}
+
+// =====================================================================
+// Conversions — kept local to avoid coupling to anyhow elsewhere.
+// =====================================================================
+//
+// `windows::core::Error` is the type that windows-rs 0.58 returns from
+// every fallible COM call. Implementing `From` here lets the rest of
+// the codebase use `?` propagation on `Result<_, windows::core::Error>`
+// without an explicit map_err at every call site.
+// =====================================================================
+
+impl From<windows::core::Error> for JacqueError {
+    fn from(err: windows::core::Error) -> Self {
         JacqueError::Com {
             interface: ComInterfaceId::Unknown,
             hr: err.code().0 as u32,

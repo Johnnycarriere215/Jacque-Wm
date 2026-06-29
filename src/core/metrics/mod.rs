@@ -30,7 +30,11 @@ impl Default for CpuSample {
 
 /// GPU utilisation. `presentable` is `true` when a real number could
 /// be read; otherwise the panel should show `GPU --`.
-#[derive(Debug, Clone, Copy, PartialEq)]
+///
+/// NOTE: cannot derive `Copy` because `adapter_name` holds
+/// `Option<String>`. Clone is fine;
+//   all consumers store this inside a `Clone`-derived `PanelState`.
+#[derive(Debug, Clone, PartialEq)]
 pub struct GpuSample {
     /// `true` if `percent` is meaningful.
     pub presentable: bool,

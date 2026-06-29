@@ -71,22 +71,25 @@ impl TrayState {
         Self::default()
     }
     pub fn mark_installed(&self) -> bool {
-        let mut g = self.inner.lock().unwrap();
+        // parking_lot::Mutex::lock() returns a MutexGuard directly.
+        // (`std::sync::Mutex::lock()` is the one that returns
+        // `Result`, and this file uses parking_lot, not std.)
+        let mut g = self.inner.lock();
         let prev = g.installed;
         g.installed = true;
         prev
     }
     pub fn mark_removed(&self) {
-        self.inner.lock().unwrap().installed = false;
+        self.inner.lock().installed = false;
     }
     pub fn is_installed_value(&self) -> bool {
-        self.inner.lock().unwrap().installed
+        self.inner.lock().installed
     }
     pub fn set_sink(&self, sink: TraySink) {
-        self.inner.lock().unwrap().sink = Some(sink);
+        self.inner.lock().sink = Some(sink);
     }
     pub fn dispatch(&self, action: TrayAction) {
-        let g = self.inner.lock().unwrap();
+        let g = self.inner.lock();
         if let Some(sink) = g.sink.as_ref() {
             sink(action);
         }
