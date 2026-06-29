@@ -133,6 +133,7 @@ fn print_help() {
     println!("Flags:");
     println!("  --dir DIR      Install/uninstall location. Defaults to %APPDATA%\\JacqueWM");
     println!("  --auto-start   Register HKCU\\...\\Run on install (default off; never required).");
+    println!("  --no-auto-start  Re-run install with auto-start cleared (default state).");
     println!("  --help, -h     Print this message.");
 }
 

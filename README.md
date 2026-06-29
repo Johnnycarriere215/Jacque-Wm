@@ -239,14 +239,23 @@ all default to safe values; you can omit any of them.
 ## CLI
 
 ```
-jacquewm.exe                  # run normally
-jacquewm.exe --register       # write HKCU\…\Run value
-jacquewm.exe --unregister     # remove the Run value
-jacquewm.exe --version        # print version
-jacquewm-installer.exe install [--dir DIR] [--auto-start]
-jacquewm-installer.exe portable [--dir DIR]
+jacquewm.exe                  # run normally (no flags; the binary just starts)
+jacquewm-installer.exe install   [--dir DIR] [--auto-start]
+jacquewm-installer.exe portable  [--dir DIR]
 jacquewm-installer.exe uninstall [--dir DIR]
 ```
+
+`jacquewm.exe` itself takes no flags. Boot-on-login is the installer's
+`--auto-start` flag — it writes the `HKCU\…\Run\JacqueWM` value at
+install time (and clears it on uninstall). To later disable
+auto-start without reinstalling, re-run with `--no-auto-start`:
+
+```pwsh
+jacquewm-installer.exe install --dir C:\Tools\JacqueWM --no-auto-start
+```
+
+Run `jacquewm-installer.exe --help` for the full flag list and
+defaults (`--dir` falls back to `%APPDATA%\JacqueWM`).
 
 ---
 
