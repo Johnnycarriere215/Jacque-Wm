@@ -1,0 +1,109 @@
+[package]
+name = "jacquewm"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "A modern Windows workspace manager inspired by Hyprland, i3, Aerospace and Yabai."
+authors = ["JacqueWM Contributors"]
+license = "MIT"
+repository = "https://github.com/jacquewm/jacquewm"
+homepage = "https://github.com/jacquewm/jacquewm"
+readme = "README.md"
+keywords = ["windows", "workspace", "tiling", "desktop-manager", "hyprland"]
+categories = ["window-management", "os"]
+exclude = [
+    ".github/*",
+    "docs/*",
+    "assets/*",
+    "examples/*",
+    "tests/fixtures/*",
+]
+
+[lib]
+name = "jacquewm"
+path = "src/lib.rs"
+
+[[bin]]
+name = "jacquewm"
+path = "src/main.rs"
+
+[[bin]]
+name = "jacquewm-installer"
+path = "src/bin/installer.rs"
+
+[dependencies]
+# ---------------------------------------------------------------------
+# Windows API bindings (Microsoft's official Rust crate)
+# ---------------------------------------------------------------------
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_System_Com",
+    "Win32_System_Threading",
+    "Win32_System_Registry",
+    "Win32_System_Console",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Shell",
+    "Win32_UI_Accessibility",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Direct3D11",
+    "Win32_Graphics_Dxgi",
+] }
+windows-result = "0.1"
+windows-targets = "0.52"
+
+# ---------------------------------------------------------------------
+# Async runtime / channels
+# ---------------------------------------------------------------------
+tokio = { version = "1.36", features = ["rt-multi-thread", "macros", "time", "sync"] }
+async-channel = "2.0"
+
+# ---------------------------------------------------------------------
+# Configuration & serialization
+# ---------------------------------------------------------------------
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+
+# ---------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "registry"] }
+tracing-appender = "0.2"
+
+# ---------------------------------------------------------------------
+# Errors
+# ---------------------------------------------------------------------
+thiserror = "1.0"
+anyhow = "1.0"
+
+# ---------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------
+chrono = { version = "0.4", features = ["serde"] }
+parking_lot = "0.12"
+once_cell = "1.19"
+dirs = "5.0"
+bitflags = { version = "2.4", features = ["serde"] }
+async-trait = "0.1"
+
+# ---------------------------------------------------------------------
+# Live config reload (SettingsManager)
+# ---------------------------------------------------------------------
+notify = "6"
+notify-debouncer-full = "0.3"
+
+[dev-dependencies]
+tempfile = "3.9"
+tokio = { version = "1.36", features = ["rt-multi-thread", "macros", "time", "sync", "test-util"] }
+
+[profile.release]
+opt-level = "z"     # Optimize for size: small binary, low memory
+lto = true          # Enable Link-Time Optimization
+codegen-units = 1   # Reduce codegen units for better optimization
+panic = "abort"      # Smaller binary, no unwind tables
+strip = true         # Strip symbols from release binary
+
+[profile.dev]
+opt-level = 1
+debug = 1

@@ -1,0 +1,105 @@
+# ====================================================================
+# JacqueWM — example configuration
+# ====================================================================
+#
+# Copy this file to:
+#   %APPDATA%\JacqueWM\config.toml        (recommended)
+# or set the JACQUEWM_CONFIG environment variable to point at any
+# other location.
+#
+# Any missing or invalid field silently falls back to its default;
+# the original (broken) value is left in place so the file can be
+# repaired by hand.
+#
+# All fields are integer/string/bool. Validators reject values outside
+# the documented ranges.
+
+# ----------------------------------------------------------------------------
+# Core (Prompt 1)
+# ----------------------------------------------------------------------------
+startup_desktop       = 1                # 1..=9; desktop switched to on launch
+workspace_count       = 9                # 1..=9; maintained automatically
+follow_moved_windows  = false            # teleport the user after a window move?
+enable_logging        = true             # write to %APPDATA%\JacqueWM\logs\
+log_filter            = ""               # `RUST_LOG`-style filter
+
+# ----------------------------------------------------------------------------
+# Top panel (Prompt 2 Part 1)
+# ----------------------------------------------------------------------------
+[panel]
+height                = 32               # 30..=34; clamped to 32 if outside range
+opacity               = 0.92             # 0..=1
+visible_in_fullscreen = true             # keep the panel visible fullscreen
+metrics_refresh_ms    = 1000             # right-section refresh interval
+
+# ----------------------------------------------------------------------------
+# Tiling engine gaps / dividers (Prompt 2 Part 2)
+# ----------------------------------------------------------------------------
+[tiling]
+outer_gap             = 6                # gap between workspace edge and tiles
+inner_gap             = 6                # gap between tiled siblings
+smart_gaps            = true             # drop outer gaps with a single tile
+divider_thickness_px  = 6                # 2..=32; clipped
+divider_color_override = 0               # 0xAARRGGBB; 0 = use theme
+
+# ----------------------------------------------------------------------------
+# Theme tokens (Prompt 3)
+# ----------------------------------------------------------------------------
+[theme]
+name                  = "omarchy-dark"   # only built-in today
+animation_speed       = 1.0              # animation multiplier
+
+# ----------------------------------------------------------------------------
+# Application launcher (Prompt 3)
+# ----------------------------------------------------------------------------
+[launcher]
+enabled               = true
+# Super+Space hotkey is hard-coded for this milestone.
+width                 = 640
+height                = 360
+max_results           = 32
+auto_dismiss_seconds  = 0                # 0 = never auto-dismiss
+
+# ----------------------------------------------------------------------------
+# System tray (Prompt 3)
+# ----------------------------------------------------------------------------
+[tray]
+enabled               = true
+show_icon             = true
+allow_exit            = true
+allow_restart         = true
+allow_open_logs       = true
+
+# ----------------------------------------------------------------------------
+# Notifications (Prompt 3)
+# ----------------------------------------------------------------------------
+[notifications]
+enabled               = true
+duration_ms           = 3500             # per-toast auto-dismiss timeout
+max_visible           = 4                # max stacked
+play_sound            = false            # default off — no Win10 toast override
+
+# ----------------------------------------------------------------------------
+# Startup behaviour (Prompt 3 + 4)
+# ----------------------------------------------------------------------------
+[startup]
+auto_start            = false            # opt-in HKCU\...\Run registration
+wait_for_explorer     = true             # pause boot for Explorer.exe ready
+explorer_wait_timeout_secs = 30
+crash_watchdog        = false            # design only — no service installed
+
+# ----------------------------------------------------------------------------
+# Debug (Prompt 4)
+# ----------------------------------------------------------------------------
+[debug]
+debug_mode            = false            # MASTER toggle for DebugManager
+log_to_stdout         = false
+layout_visualization  = false
+
+# ----------------------------------------------------------------------------
+# Plugins (Prompt 4 — design only; not loaded at runtime yet)
+# ----------------------------------------------------------------------------
+[plugins]
+plugin_dir            = ""               # future-friendly
+allow                 = []               # empty = nothing loaded
+deny                  = []

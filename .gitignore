@@ -1,0 +1,46 @@
+# ====================================================================
+# JacqueWM .gitignore
+# ====================================================================
+
+# Cargo build artifacts
+/target/
+**/*.rs.bk
+**/*.pdb
+
+# Visual Studio / Rider / IntelliJ
+.idea/
+.vscode/
+*.iml
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+
+# Generated binaries
+*.exe
+*.dll
+*.lib
+*.so
+*.dylib
+
+# Local config overrides
+config/local.toml
+.env
+
+# Logs created by the application (when running locally)
+*.log
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Test output
+tests/output/
+coverage/
+
+# Editor swap files
+*.swp
+*.swo
+*~
